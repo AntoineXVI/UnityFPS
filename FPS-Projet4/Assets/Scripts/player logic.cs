@@ -8,33 +8,31 @@ public class playerlogic : MonoBehaviour
     public int speed;
     public int speedCameraY;
     public int speedCameraX;
-    public bool onGround;
+    public bool isWeaponEquiped;
+    public GameObject weapon;
+
     // Start is called before the first frame update
     void Start()
     {
-        onGround = false;
         speed = 5;
         speedCameraY = 40;
         speedCameraX = 50;
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
+
+        isWeaponEquiped = true;
     }
-    /*void OnCollisionEnter(Collision collision)
+    bool grounded()
     {
-        if (collision.gameObject.tag == "Ground")
+        if (GetComponent<Rigidbody>().velocity.y == 0)
         {
-            //Debug.Log("name" + gameObject.name);
-            Debug.Log("name" + GameObject.FindWithTag("Ground").name);
-            onGround = true;
+            return true;
+        }
+        else
+        {
+            return false;
         }
     }
-    void OnCollisionExit(Collision collision)
-    {
-        if (collision.gameObject.tag == "Ground")
-        {
-            onGround = false;
-        }
-    }*/
 
     // Update is called once per frame
     void Update()
@@ -55,13 +53,9 @@ public class playerlogic : MonoBehaviour
             }
         }
 
-        if (Input.GetButtonDown("Jump")) //saut s'il est au sol
+        if (Input.GetButtonDown("Jump") && grounded()) //saut s'il est au sol
         {
-            Debug.Log("tag = " + onGround);
-            if ( onGround)
-            {
-                GetComponent<Rigidbody>().AddForce(new Vector3(0, 5, 0), ForceMode.Impulse);
-            }
+            GetComponent<Rigidbody>().AddForce(new Vector3(0, 5, 0), ForceMode.Impulse);
         }
         if (Input.GetButtonDown("Sprint")) 
         {
@@ -83,25 +77,55 @@ public class playerlogic : MonoBehaviour
         }
         if (Input.GetButtonDown("Shoot"))
         {
-            //if weapon equipped
-            //shoot
-            Debug.Log("shoot");
+            if (isWeaponEquiped)
+            {
+                Debug.Log("shoot");
+                //shoot
+            }
+            else
+            {
+                Debug.Log("no weapon");
+            }
+            
         }
         if (Input.GetButtonDown("Reload"))
         {
-            //if weapon equipped
-            //reload
-            Debug.Log("reload");
+            if (isWeaponEquiped)
+            {
+                Debug.Log("reload");
+                //reload
+            }
+            else
+            {
+                Debug.Log("no weapon");
+            }            
         }
         if (Input.GetButtonDown("TakeWeapon"))
         {
-            //if 0 weapon equipped
-            Debug.Log("take weapon");
+            if (!isWeaponEquiped)
+            {
+                Debug.Log("take weapon");
+                //take weapon
+            }
+            else
+            {
+                Debug.Log("weapon already equipped");
+            }
+            
         }
         if (Input.GetButtonDown("DropWeapon"))
         {
-            //if weapon equipped
-            Debug.Log("drop");
+            if (isWeaponEquiped)
+            {
+                Debug.Log("drop");
+                isWeaponEquiped = false;
+                //drop weapon
+            }
+            else
+            {
+                Debug.Log("no weapon");
+            }
+            
         }
         //mouvements
         float translationV = Input.GetAxis("Vertical") * Time.deltaTime * speed;
