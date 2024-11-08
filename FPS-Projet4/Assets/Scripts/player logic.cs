@@ -8,18 +8,23 @@ public class playerlogic : MonoBehaviour
     public int speed;
     public int speedCameraY;
     public int speedCameraX;
-    private bool onGround;
+    public bool onGround;
     // Start is called before the first frame update
     void Start()
     {
+        onGround = false;
         speed = 5;
         speedCameraY = 40;
         speedCameraX = 50;
+        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
     }
-    void OnCollisionEnter(Collision collision)
+    /*void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.tag == "Ground")
         {
+            //Debug.Log("name" + gameObject.name);
+            Debug.Log("name" + GameObject.FindWithTag("Ground").name);
             onGround = true;
         }
     }
@@ -29,15 +34,34 @@ public class playerlogic : MonoBehaviour
         {
             onGround = false;
         }
-    }
+    }*/
 
     // Update is called once per frame
     void Update()
     {
-        Debug.Log("tag = " + onGround);
-        if (Input.GetButtonDown("Jump") /*&& onGround*/) //saut s'il est au sol
+        //Debug.Log("tag = " + onGround);
+        if (Input.GetButtonDown("SetCursor")) //hide or show the cursor
         {
-            GetComponent<Rigidbody>().AddForce(new Vector3(0, 5, 0), ForceMode.Impulse);
+            Debug.Log("cursor");
+            if (Cursor.visible)
+            {
+                Cursor.visible = false;
+                Cursor.lockState = CursorLockMode.Locked;
+            }
+            else
+            {
+                Cursor.visible = true;
+                Cursor.lockState = CursorLockMode.None;
+            }
+        }
+
+        if (Input.GetButtonDown("Jump")) //saut s'il est au sol
+        {
+            Debug.Log("tag = " + onGround);
+            if ( onGround)
+            {
+                GetComponent<Rigidbody>().AddForce(new Vector3(0, 5, 0), ForceMode.Impulse);
+            }
         }
         if (Input.GetButtonDown("Sprint")) 
         {
@@ -84,8 +108,7 @@ public class playerlogic : MonoBehaviour
 
         float translationH = Input.GetAxis("Horizontal") * Time.deltaTime * speed;
 
-        transform.Translate(translationH, 0, translationV);
-
+        transform.Translate(translationH, 0, translationV) ;
         //camera 
         float rotationV = Input.GetAxis("Mouse Y") * Time.deltaTime * speed;
        
