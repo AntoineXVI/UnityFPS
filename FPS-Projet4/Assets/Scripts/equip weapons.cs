@@ -9,15 +9,29 @@ public class equipweapons : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        player = GameObject.FindWithTag("Player");
+        player = GameObject.FindWithTag("Player");        
+    }
+
+    private void Update()
+    {
+        if (gameObject.transform.parent == player.transform) //si l'arme est un enfant = equipé
+        {
+            player.GetComponent<playerlogic>().isWeaponEquiped = true;
+            player.GetComponent<playerlogic>().weapon = gameObject;
+            gameObject.SetActive(true);
+        }
     }
     private void OnCollisionEnter(Collision collision)
     {
         if (collision.gameObject.tag == "Player")
         {
-            Debug.Log("weapon equipped");
+            //arme par terre recuperable
+            Debug.Log("collide");
+            player.GetComponent<playerlogic>().isWeaponArround = true;
+            player.GetComponent<playerlogic>().weapon = gameObject; 
+            /*Debug.Log("weapon equipped");
             player.GetComponent<playerlogic>().isWeaponEquiped = true;
-            player.GetComponent<playerlogic>().weapon = gameObject;
+            */
         }
     }
 
@@ -25,8 +39,12 @@ public class equipweapons : MonoBehaviour
     {
         if (collision.gameObject.tag == "Player")
         {
-            Debug.Log("weapon droppped");
-            player.GetComponent<playerlogic>().isWeaponEquiped = false;
+            //arme par terre n'est plus recuperable
+            Debug.Log("no collide");
+            player.GetComponent<playerlogic>().isWeaponArround = false;
+            /* Debug.Log("weapon droppped");
+             player.GetComponent<playerlogic>().isWeaponEquiped = false;*/
         }
     }
+    
 }

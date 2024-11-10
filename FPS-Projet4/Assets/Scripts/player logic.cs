@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Burst.CompilerServices;
 using UnityEngine;
 
 public class playerlogic : MonoBehaviour
@@ -9,6 +10,7 @@ public class playerlogic : MonoBehaviour
     public int speedCameraY;
     public int speedCameraX;
     public bool isWeaponEquiped;
+    public bool isWeaponArround;
     public GameObject weapon;
 
     // Start is called before the first frame update
@@ -20,7 +22,8 @@ public class playerlogic : MonoBehaviour
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
 
-        isWeaponEquiped = true;
+        isWeaponEquiped = false;
+        isWeaponArround = false;
     }
     bool grounded()
     {
@@ -100,18 +103,29 @@ public class playerlogic : MonoBehaviour
                 Debug.Log("no weapon");
             }            
         }
+       
         if (Input.GetButtonDown("TakeWeapon"))
         {
-            if (!isWeaponEquiped)
+            if (!isWeaponEquiped) //s'il y a une arme au sol et le player n'en a pas
             {
                 Debug.Log("take weapon");
                 //take weapon
+                if (isWeaponArround)
+                {
+                    Debug.Log("weapon taken");
+                    weapon.transform.SetParent(transform);
+                    weapon.transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z + 1f);
+                    isWeaponArround = false;
+                }
+                else
+                {
+                    Debug.Log("no weapon here");
+                }
             }
             else
             {
                 Debug.Log("weapon already equipped");
             }
-            
         }
         if (Input.GetButtonDown("DropWeapon"))
         {
@@ -119,7 +133,8 @@ public class playerlogic : MonoBehaviour
             {
                 Debug.Log("drop");
                 isWeaponEquiped = false;
-                //drop weapon
+                weapon.SetActive(false);
+                weapon = null;
             }
             else
             {
