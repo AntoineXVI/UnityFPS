@@ -27,11 +27,9 @@ public class equipweapons : MonoBehaviour
         {
             //arme par terre recuperable
             Debug.Log("collide");
+            player.GetComponent<playerlogic>().weapon = gameObject;
+            Debug.Log(player.GetComponent<playerlogic>().weapon);
             player.GetComponent<playerlogic>().isWeaponArround = true;
-            player.GetComponent<playerlogic>().weapon = gameObject; 
-            /*Debug.Log("weapon equipped");
-            player.GetComponent<playerlogic>().isWeaponEquiped = true;
-            */
         }
     }
 
@@ -42,8 +40,6 @@ public class equipweapons : MonoBehaviour
             //arme par terre n'est plus recuperable
             Debug.Log("no collide");
             player.GetComponent<playerlogic>().isWeaponArround = false;
-            /* Debug.Log("weapon droppped");
-             player.GetComponent<playerlogic>().isWeaponEquiped = false;*/
         }
     }
     
