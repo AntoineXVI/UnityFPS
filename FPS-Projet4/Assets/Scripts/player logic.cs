@@ -1,6 +1,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using Unity.Burst.CompilerServices;
 using UnityEngine;
 
 public class playerlogic : MonoBehaviour
@@ -8,8 +9,16 @@ public class playerlogic : MonoBehaviour
     public int speed;
     public int speedCameraY;
     public int speedCameraX;
-    public bool isWeaponEquiped;
     public GameObject weapon;
+    public GameObject bullet;
+    public GameObject bulletCasing;
+
+    public bool isWeaponEquiped;
+    public bool isWeaponArround;
+
+    private Vector3 weaponPos;
+    private Vector3 bulletPos;
+    private Quaternion weaponRota;
 
     // Start is called before the first frame update
     void Start()
@@ -19,8 +28,12 @@ public class playerlogic : MonoBehaviour
         speedCameraX = 50;
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
+        bullet = GameObject.Find("BulletLite_01_1");
+        bulletCasing = GameObject.Find("BulletLite_01_2");
+        weapon = null;
 
-        isWeaponEquiped = true;
+        isWeaponEquiped = false;
+        isWeaponArround = false;
     }
     bool grounded()
     {
@@ -37,7 +50,6 @@ public class playerlogic : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        //Debug.Log("tag = " + onGround);
         if (Input.GetButtonDown("SetCursor")) //hide or show the cursor
         {
             Debug.Log("cursor");
@@ -75,12 +87,37 @@ public class playerlogic : MonoBehaviour
             //stop crouch
             Debug.Log("uncrouch");
         }
-        if (Input.GetButtonDown("Shoot"))
+        if (Input.GetButtonDown("Shoot")) //tire s'il a une arme
         {
             if (isWeaponEquiped)
             {
                 Debug.Log("shoot");
-                //shoot
+                //balle
+                if (weapon)
+                {
+                    bulletPos = weapon.transform.Find("BulletPosition").transform.position;
+                    GameObject bullet1 = Instantiate(bullet, bulletPos, weapon.transform.rotation);
+                    bullet1.transform.RotateAround(bullet1.transform.position, Vector3.up, -90);
+                    bullet1.name = "bullet1";
+                    bullet1.AddComponent<BoxCollider>();
+                    bullet1.GetComponent<BoxCollider>().isTrigger = true;
+                    bullet1.AddComponent<ammologic>();
+
+                    //douille de balle
+                    bulletPos = weapon.transform.Find("BulletPosition").transform.position;
+                    GameObject bulletCasing1 = Instantiate(bullet, weapon.transform.position, weapon.transform.rotation);
+                    bulletCasing1.name = "bulletCasing1";
+                    bulletCasing1.transform.RotateAround(bulletCasing1.transform.position, Vector3.up, -90);
+                    bulletCasing1.AddComponent<Rigidbody>();
+                    bulletCasing1.AddComponent<BoxCollider>();
+                    bulletCasing1.AddComponent<ammologic>();
+                }
+                else
+                {
+                    Debug.Log("error weapon");
+                    Debug.Log(weapon);
+                }
+                
             }
             else
             {
@@ -88,7 +125,7 @@ public class playerlogic : MonoBehaviour
             }
             
         }
-        if (Input.GetButtonDown("Reload"))
+        if (Input.GetButtonDown("Reload")) //recharge s'il a une arme
         {
             if (isWeaponEquiped)
             {
@@ -100,26 +137,41 @@ public class playerlogic : MonoBehaviour
                 Debug.Log("no weapon");
             }            
         }
-        if (Input.GetButtonDown("TakeWeapon"))
+       
+        if (Input.GetButtonDown("TakeWeapon")) //rmasse une arme
         {
-            if (!isWeaponEquiped)
+            if (!isWeaponEquiped) //s'il y a une arme au sol et le player n'en a pas
             {
                 Debug.Log("take weapon");
                 //take weapon
+                if (isWeaponArround)
+                {
+                    Debug.Log("weapon taken");
+                    weapon.transform.SetParent(transform);
+                    weaponPos = GameObject.Find("weaponPosition").transform.position;
+                    weaponRota = GameObject.Find("weaponPosition").transform.rotation;
+                    weapon.transform.position = weaponPos;
+                    weapon.transform.rotation = weaponRota;
+                    isWeaponArround = false;
+                }
+                else
+                {
+                    Debug.Log("no weapon here");
+                }
             }
             else
             {
                 Debug.Log("weapon already equipped");
             }
-            
         }
-        if (Input.GetButtonDown("DropWeapon"))
+        if (Input.GetButtonDown("DropWeapon")) //lache son arme
         {
             if (isWeaponEquiped)
             {
                 Debug.Log("drop");
                 isWeaponEquiped = false;
-                //drop weapon
+                weapon.SetActive(false);
+                weapon = null;
             }
             else
             {

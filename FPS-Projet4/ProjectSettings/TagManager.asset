@@ -7,6 +7,7 @@ TagManager:
   - Ennemy
   - SunMoon
   - Environment
+  - Weapon
   layers:
   - Default
   - TransparentFX
