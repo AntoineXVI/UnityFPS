@@ -12,6 +12,8 @@ public class playerlogic : MonoBehaviour
     public bool isWeaponEquiped;
     public bool isWeaponArround;
     public GameObject weapon;
+    public Vector3 weaponPos;
+    public Quaternion weaponRota;
 
     // Start is called before the first frame update
     void Start()
@@ -114,7 +116,10 @@ public class playerlogic : MonoBehaviour
                 {
                     Debug.Log("weapon taken");
                     weapon.transform.SetParent(transform);
-                    weapon.transform.position = new Vector3(transform.position.x, transform.position.y, transform.position.z + 1f);
+                    weaponPos = GameObject.Find("weaponPosition").transform.position;
+                    weaponRota = GameObject.Find("weaponPosition").transform.rotation;
+                    weapon.transform.position = weaponPos;
+                    weapon.transform.rotation = weaponRota;
                     isWeaponArround = false;
                 }
                 else
