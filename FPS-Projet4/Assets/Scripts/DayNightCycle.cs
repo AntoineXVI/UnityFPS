@@ -2,6 +2,7 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using UnityEditor;
 using UnityEngine;
 
 public class DayNightCycle : MonoBehaviour
@@ -9,45 +10,42 @@ public class DayNightCycle : MonoBehaviour
 
     public float EnvironmentIntensity1 = 3.0f;
     public float EnvironmentIntensityStart = 10.0f;
-    public float dayTime = 6.0f;
-    public float dayTick = 600f;
-    public float timeTick = 0.0f;
+    public float dayTime = 1.0f;
+    private float dayTick = 600f;
+    private float timeTick = 0.0f;
+    
+    private bool start;
+    private bool darken = true;
+    private bool lighten = false;
+    private bool intensity = false;
 
-
-    public bool start;
-    public bool darken = true;
-    public bool lighten = false;
-    public bool intensity = false;
-
+    public Material environmentLight;
     GameObject sunMoon;
-    GameObject environmentLighting;
+    
 
     // Start is called before the first frame update
     void Start()
     {
         RenderSettings.ambientIntensity = EnvironmentIntensityStart;
         start = true;
+        sunMoon = GameObject.FindWithTag("SunMoon");
+        environmentLight.SetColor("_EmissionColor", new Color(1, 1, 1) * 4f);
     }
 
     // Update is called once per frame
     void Update()
     {
-
         if (RenderSettings.ambientIntensity > EnvironmentIntensity1 && start == true)
         {
-            RenderSettings.ambientIntensity -= 0.01f;
-            if (RenderSettings.ambientIntensity == EnvironmentIntensity1)
+            RenderSettings.ambientIntensity -= 0.2f;
+            if (RenderSettings.ambientIntensity <= EnvironmentIntensity1)
             {
                 start = false;
-
             }
         }
         else
         {
-            sunMoon = GameObject.FindWithTag("SunMoon");
-            sunMoon.transform.Rotate(0.0f, 0.3f / dayTime, 0.0f);
-            //Task.Delay(TimeSpan.FromSeconds(30)).Wait();
-            //Task.Delay(1000).ContinueWith(t=> //CodeDeLaSuite);
+            rotateSun();
 
             if (timeTick < dayTime * dayTick)
             {
@@ -58,10 +56,10 @@ public class DayNightCycle : MonoBehaviour
                 intensity = true;
                 timeTick = 0f;
             }
-
             if (RenderSettings.ambientIntensity >= 0 && darken == true && intensity == true)
             {
                 RenderSettings.ambientIntensity -= 0.01f;
+                environmentLight.SetColor("_EmissionColor", new Color(1, 1, 1) * -10f);
                 if (RenderSettings.ambientIntensity <= 0f)
                 {
                     darken = false;
@@ -72,15 +70,20 @@ public class DayNightCycle : MonoBehaviour
             if (RenderSettings.ambientIntensity <= EnvironmentIntensity1 && lighten == true && intensity == true)
             {
                 RenderSettings.ambientIntensity += 0.01f;
+                environmentLight.SetColor("_EmissionColor", new Color(1 ,1 ,1) * 4f);
                 if (RenderSettings.ambientIntensity >= EnvironmentIntensity1)
                 {
-                    //environmentLighting = GameObject.FindWithTag("Environment");
-                    //environmentLighting.GetComponent<Renderer>().material.SetColor("_EmissionColor", new Color(0, 0, 0) * (-5f));
                     darken = true;
                     lighten = false;
                     intensity = false;
                 }
             }
         }
+    }
+
+    //à Rajouter une Coroutine pour optimiser le code
+    public void rotateSun()
+    {
+        sunMoon.transform.Rotate(0.0f, 0.3f / dayTime, 0.0f);
     }
 }
