@@ -8,6 +8,7 @@ public class ammologic : MonoBehaviour
     float speed;
     GameObject weapon;
     Vector3 SpawnPosition;
+
     // Start is called before the first frame update
     void Start()
     {
@@ -25,7 +26,29 @@ public class ammologic : MonoBehaviour
 
     private void OnCollisionEnter(Collision collision)
     {
-        Debug.Log("hit bullet");
-        Destroy(gameObject); 
+        if (collision.gameObject.tag == "Player")
+        {
+            //Add Logic
+            Debug.Log("Player Lost HP");
+            Destroy(gameObject);
+        }
+        if (collision.gameObject.tag == "Ennemy")
+        {
+            
+            Debug.Log("Mob Lost HP");
+            collision.gameObject.GetComponent<MobLogic>().LoseHealth();
+            Destroy(gameObject);
+        }
+        if (collision.gameObject.tag == "Environment")
+        {
+            Debug.Log("Hit Environment");
+            Destroy(gameObject);
+        }
+        else
+        {
+            Debug.Log("BulletDestroyed");
+            Destroy(gameObject);
+        }
+
     }
 }

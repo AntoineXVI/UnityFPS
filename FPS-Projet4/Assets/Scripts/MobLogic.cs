@@ -2,13 +2,15 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class MobSpawner : MonoBehaviour
+public class MobLogic : MonoBehaviour
 {
-    public GameObject mobList;
+    //GameObject mob;
+    public int health = 3;
+
     // Start is called before the first frame update
     void Start()
     {
-        mobList.SetActive(false);
+        //mob.gameObject.SetActive(false);
     }
 
     // Update is called once per frame
@@ -17,12 +19,12 @@ public class MobSpawner : MonoBehaviour
         
     }
 
-    private void OnTriggerEnter(Collider other)
+    public void LoseHealth()
     {
-        if (other.gameObject.tag == "Player")
+        health--;
+        if (health == 0)
         {
-            Debug.Log("Mob Activated");
-            mobList.SetActive(true);
+            Destroy(gameObject);
         }
     }
 }

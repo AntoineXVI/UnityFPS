@@ -10,7 +10,7 @@ public class DayNightCycle : MonoBehaviour
 
     public float EnvironmentIntensity1 = 3.0f;
     public float EnvironmentIntensityStart = 10.0f;
-    public float dayTime = 1.0f;
+    public float dayTime = 6.0f;
     private float dayTick = 600f;
     private float timeTick = 0.0f;
     
@@ -37,7 +37,7 @@ public class DayNightCycle : MonoBehaviour
     {
         if (RenderSettings.ambientIntensity > EnvironmentIntensity1 && start == true)
         {
-            RenderSettings.ambientIntensity -= 0.2f;
+            RenderSettings.ambientIntensity -= 0.1f;
             if (RenderSettings.ambientIntensity <= EnvironmentIntensity1)
             {
                 start = false;

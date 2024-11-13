@@ -7,11 +7,21 @@ public class EnnemyBehaviour : MonoBehaviour
 {
     private NavMeshAgent agent;
     private GameObject following;
+    private float stopDistance = 5f;
 
     private void followPlayer()
     {
-        agent.SetDestination(following.transform.position);
+        float distance = Vector3.Distance(agent.transform.position, following.transform.position);
+        if (distance > stopDistance)
+        {
+            agent.SetDestination(following.transform.position);
+        }
+        else
+        {
+            agent.ResetPath();
+        }
     }
+
     void Start()
     {
         agent = GetComponent<NavMeshAgent>();
