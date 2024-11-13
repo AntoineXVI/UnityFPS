@@ -6,10 +6,12 @@ using UnityEngine;
 public class equipweapons : MonoBehaviour
 {
     public GameObject player;
+    public int ammo;
     // Start is called before the first frame update
     void Start()
     {
-        player = GameObject.FindWithTag("Player");        
+        player = GameObject.FindWithTag("Player");
+        ammo = 10;
     }
 
     private void Update()

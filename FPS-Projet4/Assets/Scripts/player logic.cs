@@ -95,29 +95,39 @@ public class playerlogic : MonoBehaviour
                 //balle
                 if (weapon)
                 {
-                    bulletPos = weapon.transform.Find("BulletPosition").transform.position;
-                    GameObject bullet1 = Instantiate(bullet, bulletPos, weapon.transform.rotation);
-                    bullet1.transform.RotateAround(bullet1.transform.position, Vector3.up, -90);
-                    bullet1.name = "bullet1";
-                    bullet1.AddComponent<BoxCollider>();
-                    bullet1.GetComponent<BoxCollider>().isTrigger = true;
-                    bullet1.AddComponent<ammologic>();
+                    if (weapon.GetComponent<equipweapons>().ammo >= 1) //si on a plus d'une balle
+                    {
+                        bulletPos = weapon.transform.Find("BulletPosition").transform.position;
+                        GameObject bullet1 = Instantiate(bullet, bulletPos, weapon.transform.rotation);
+                        bullet1.transform.RotateAround(bullet1.transform.position, Vector3.up, -90);
+                        bullet1.name = "bullet1";
+                        bullet1.AddComponent<BoxCollider>();
+                        bullet1.GetComponent<BoxCollider>().isTrigger = true;
+                        bullet1.AddComponent<ammologic>();
+                        bullet1.transform.localScale *= 3;
 
-                    //douille de balle
-                    bulletPos = weapon.transform.Find("BulletPosition").transform.position;
-                    GameObject bulletCasing1 = Instantiate(bullet, weapon.transform.position, weapon.transform.rotation);
-                    bulletCasing1.name = "bulletCasing1";
-                    bulletCasing1.transform.RotateAround(bulletCasing1.transform.position, Vector3.up, -90);
-                    bulletCasing1.AddComponent<Rigidbody>();
-                    bulletCasing1.AddComponent<BoxCollider>();
-                    bulletCasing1.AddComponent<ammologic>();
+                        weapon.GetComponent<equipweapons>().ammo -= 1;
+
+                        //douille de balle
+                        bulletPos = weapon.transform.Find("BulletPosition").transform.position;
+                        GameObject bulletCasing1 = Instantiate(bullet, weapon.transform.position, weapon.transform.rotation);
+                        bulletCasing1.name = "bulletCasing1";
+                        bulletCasing1.transform.RotateAround(bulletCasing1.transform.position, Vector3.up, -90);
+                        bulletCasing1.AddComponent<Rigidbody>();
+                        bulletCasing1.AddComponent<BoxCollider>();
+                        bulletCasing1.AddComponent<ammologic>();
+                        bulletCasing1.transform.localScale *= 3;
+                    }
+                    else
+                    {
+                        Debug.Log("no ammo");
+                    }
                 }
                 else
                 {
                     Debug.Log("error weapon");
                     Debug.Log(weapon);
                 }
-                
             }
             else
             {
@@ -131,6 +141,7 @@ public class playerlogic : MonoBehaviour
             {
                 Debug.Log("reload");
                 //reload
+                weapon.GetComponent<equipweapons>().ammo = 10;
             }
             else
             {

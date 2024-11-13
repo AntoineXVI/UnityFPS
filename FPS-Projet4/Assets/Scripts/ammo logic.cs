@@ -11,7 +11,7 @@ public class ammologic : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        speed = 2.5f;
+        speed = 4f;
         weapon = GameObject.FindWithTag("Player").GetComponent<playerlogic>().weapon;
         SpawnPosition = weapon.transform.GetChild(4).position;
         gameObject.SetActive(true);
