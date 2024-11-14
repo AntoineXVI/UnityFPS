@@ -12,7 +12,7 @@ public class ammologic : MonoBehaviour
     // Start is called before the first frame update
     void Start()
     {
-        speed = 4f;
+        speed = 8f;
         weapon = GameObject.FindWithTag("Player").GetComponent<playerlogic>().weapon;
         SpawnPosition = weapon.transform.GetChild(4).position;
         gameObject.SetActive(true);
@@ -24,24 +24,27 @@ public class ammologic : MonoBehaviour
         transform.position += -transform.right * speed * Time.deltaTime;
     }
 
-    private void OnCollisionEnter(Collision collision)
+    private void OnTriggerEnter(Collider other)
     {
-        if (collision.gameObject.tag == "Player")
+        if (other.gameObject.tag == "Player")
         {
-            //Add Logic
             Debug.Log("Player Lost HP");
+            other.gameObject.GetComponent<playerlogic>().LoseHealth();
             Destroy(gameObject);
         }
-        if (collision.gameObject.tag == "Ennemy")
+        if (other.gameObject.tag == "Ennemy")
         {
-            
             Debug.Log("Mob Lost HP");
-            collision.gameObject.GetComponent<MobLogic>().LoseHealth();
+            other.gameObject.GetComponent<MobLogic>().LoseHealth();
             Destroy(gameObject);
         }
-        if (collision.gameObject.tag == "Environment")
+        if (other.gameObject.tag == "Weapon")
         {
-            Debug.Log("Hit Environment");
+            Debug.Log("Our Weapon was hit");
+        }
+        if (other.gameObject.tag == "Environment")
+        {
+            Debug.Log("BulletDestroyed");
             Destroy(gameObject);
         }
         else
@@ -49,6 +52,5 @@ public class ammologic : MonoBehaviour
             Debug.Log("BulletDestroyed");
             Destroy(gameObject);
         }
-
     }
 }

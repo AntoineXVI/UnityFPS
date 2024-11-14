@@ -8,6 +8,11 @@ TagManager:
   - SunMoon
   - Environment
   - Weapon
+  - UI
+  - WeaponSpawn
+  - UICaller
+  - Audio
+  - Heal
   layers:
   - Default
   - TransparentFX

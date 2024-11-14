@@ -6,11 +6,23 @@ public class MobLogic : MonoBehaviour
 {
     //GameObject mob;
     public int health = 3;
+    GameObject weapon;
+
+    private AudioManagingScript audioClass;
 
     // Start is called before the first frame update
     void Start()
     {
-        //mob.gameObject.SetActive(false);
+        weapon = GameObject.FindWithTag("WeaponSpawn");
+        GameObject audioObject = GameObject.FindWithTag("Audio");
+        if (audioObject != null)
+        {
+            audioClass = audioObject.GetComponent<AudioManagingScript>();
+        }
+        else
+        {
+            Debug.LogError("UI object with tag 'UI' not found");
+        }
     }
 
     // Update is called once per frame
@@ -22,8 +34,10 @@ public class MobLogic : MonoBehaviour
     public void LoseHealth()
     {
         health--;
-        if (health == 0)
+        if (health >= 0)
         {
+            audioClass.ennemyDeathSound();
+            Instantiate(weapon, transform.position, transform.rotation);
             Destroy(gameObject);
         }
     }
