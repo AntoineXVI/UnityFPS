@@ -3,7 +3,6 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Burst.CompilerServices;
 using UnityEngine;
-using UnityEngine.Android;
 
 public class playerlogic : MonoBehaviour
 {
@@ -20,12 +19,21 @@ public class playerlogic : MonoBehaviour
 
     private Vector3 weaponPos;
     private Vector3 bulletPos;
-    private Quaternion weaponRota;    
+    private Quaternion weaponRota;
+    private PlayerState currentState;
+    private Animator playerAnimator;
 
-    private AudioManagingScript audioClass;
-    private gameOverLogic uiClass;
-
-    public int health = 100;
+    private enum PlayerState
+    {
+        Idle,
+        Run,
+        Jump,
+        Shoot,
+        GetHit,
+        Reload,
+        TakeWeapon,
+        DropWeapon
+    }
 
     // Start is called before the first frame update
     void Start()
@@ -39,41 +47,89 @@ public class playerlogic : MonoBehaviour
         bullet = GameObject.Find("BulletLite_01_1");
         bulletCasing = GameObject.Find("BulletLite_01_2");
         weapon = null;
+        currentState = PlayerState.Idle;
+        playerAnimator = GetComponent<Animator>();
 
         isWeaponEquiped = false;
         isWeaponArround = false;
-
-        // Initialisation de uiClass
-        GameObject audioObject = GameObject.FindWithTag("Audio");
-        if (audioObject != null)
-        {
-            audioClass = audioObject.GetComponent<AudioManagingScript>();
-        }
-        else
-        {
-            Debug.LogError("UI object with tag 'UI' not found");
-        }
-        GameObject uiObject = GameObject.FindWithTag("UICaller");
-        if (uiObject != null)
-        {
-            uiClass = uiObject.GetComponent<gameOverLogic>();
-        }
-        else
-        {
-            Debug.LogError("UI object with tag 'UI' not found");
-        }
     }
-
     bool grounded()
     {
-        return GetComponent<Rigidbody>().velocity.y == 0;
+        if (GetComponent<Rigidbody>().velocity.y == 0)
+        {
+            return true;
+        }
+        else
+        {
+            return false;
+        }
     }
 
     // Update is called once per frame
     void Update()
     {
+        //stateMachine
+
+        switch (currentState)
+        {
+            case PlayerState.Idle:
+                Reset();
+                Debug.Log(currentState);
+                break;
+
+            case PlayerState.Run:
+                Reset();
+                Debug.Log(currentState);
+                playerAnimator.SetBool("isRuning", true);
+                Run();
+                break;
+
+            case PlayerState.Jump:
+                Reset();
+                Debug.Log(currentState);
+                playerAnimator.SetBool("isJumping", true);
+                Jump();
+                break;
+
+            case PlayerState.Shoot:
+                Reset();
+                Debug.Log(currentState);
+                playerAnimator.SetBool("isShooting", true);
+                Shoot();
+                break;
+
+            case PlayerState.GetHit:
+                Reset();
+                Debug.Log(currentState);
+                playerAnimator.SetBool("isHit", true);
+                GetHit();
+                break;
+            
+            case PlayerState.Reload:
+                Reset();
+                Debug.Log(currentState);
+                playerAnimator.SetBool("isReloading", true);
+                Reload();
+                break;
+
+            case PlayerState.TakeWeapon:
+                Reset();
+                Debug.Log(currentState);
+                playerAnimator.SetBool("Take", true);
+                TakeWeapon();
+                break;
+
+            case PlayerState.DropWeapon:
+                Reset();
+                Debug.Log(currentState);
+                playerAnimator.SetBool("Drop", true);
+                DropWeapon();
+                break;
+        }
+
         if (Input.GetButtonDown("SetCursor")) //hide or show the cursor
         {
+            Debug.Log("cursor");
             if (Cursor.visible)
             {
                 Cursor.visible = false;
@@ -88,22 +144,85 @@ public class playerlogic : MonoBehaviour
 
         if (Input.GetButtonDown("Jump") && grounded()) //saut s'il est au sol
         {
-            GetComponent<Rigidbody>().AddForce(new Vector3(0, 5, 0), ForceMode.Impulse);
+            currentState = PlayerState.Jump;
         }
-        if (Input.GetButtonDown("Sprint"))
+        if (Input.GetButtonDown("Sprint")) 
         {
-            speed *= 2;
+            currentState = PlayerState.Run;
         }
         if (Input.GetButtonUp("Sprint"))
         {
-            speed = initSpeed;
+            currentState = PlayerState.Idle;
+        }
+        if (Input.GetButtonDown("Crouch"))
+        {
+            //crouch
+            Debug.Log("Crouch");
+        }
+        if (Input.GetButtonUp("Crouch"))
+        {
+            //stop crouch
+            Debug.Log("uncrouch");
         }
         if (Input.GetButtonDown("Shoot")) //tire s'il a une arme
         {
-            if (isWeaponEquiped)
+            currentState = PlayerState.Shoot;
+            
+        }
+        if (Input.GetButtonDown("Reload")) //recharge s'il a une arme
+        {
+            currentState = PlayerState.Reload;    
+        }
+       
+        if (Input.GetButtonDown("TakeWeapon")) //rmasse une arme
+        {
+            currentState = PlayerState.TakeWeapon;
+        }
+        if (Input.GetButtonDown("DropWeapon")) //lache son arme
+        {
+            currentState = PlayerState.DropWeapon;
+            
+        }
+        //mouvements
+        float translationV = Input.GetAxis("Vertical") * Time.deltaTime * speed;
+
+        float translationH = Input.GetAxis("Horizontal") * Time.deltaTime * speed;
+
+        transform.Translate(translationH, 0, translationV) ;
+        //camera 
+        float rotationV = Input.GetAxis("Mouse Y") * Time.deltaTime * speed;
+       
+        float rotationH = Input.GetAxis("Mouse X") * Time.deltaTime * speed;
+
+        transform.RotateAround(transform.position, Vector3.up, rotationH * speedCameraX);
+        transform.RotateAround(transform.position, transform.right, -rotationV * speedCameraY);
+    }
+    private void Reset()
+    {
+        playerAnimator.SetBool("isRunning",false);
+        playerAnimator.SetBool("isShooting",false);
+        playerAnimator.SetBool("isReloading",false);
+        playerAnimator.SetBool("isJumping", false);
+        playerAnimator.SetBool("isHit",false);
+        playerAnimator.SetBool("Drop",false);
+        playerAnimator.SetBool("Take",false);
+
+        speed = initSpeed;
+    }
+
+    private void Jump()
+    {
+        GetComponent<Rigidbody>().AddForce(new Vector3(0, 5, 0), ForceMode.Impulse);
+    }
+    private void Shoot()
+    {
+        if (isWeaponEquiped)
+        {
+            Debug.Log("shoot");
+            //balle
+            if (weapon)
             {
-                Debug.Log("shoot");
-                if (weapon && weapon.GetComponent<equipweapons>().ammo >= 1)
+                if (weapon.GetComponent<equipweapons>().ammo >= 1) //si on a plus d'une balle
                 {
                     bulletPos = weapon.transform.Find("BulletPosition").transform.position;
                     GameObject bullet1 = Instantiate(bullet, bulletPos, weapon.transform.rotation);
@@ -116,7 +235,7 @@ public class playerlogic : MonoBehaviour
 
                     weapon.GetComponent<equipweapons>().ammo -= 1;
 
-                    // Bullet casing
+                    //douille de balle
                     bulletPos = weapon.transform.Find("BulletPosition").transform.position;
                     GameObject bulletCasing1 = Instantiate(bullet, weapon.transform.position, weapon.transform.rotation);
                     bulletCasing1.name = "bulletCasing1";
@@ -125,7 +244,6 @@ public class playerlogic : MonoBehaviour
                     bulletCasing1.AddComponent<BoxCollider>();
                     bulletCasing1.AddComponent<ammologic>();
                     bulletCasing1.transform.localScale *= 3;
-                    Destroy(bulletCasing1, 0.5f);
                 }
                 else
                 {
@@ -134,25 +252,43 @@ public class playerlogic : MonoBehaviour
             }
             else
             {
-                Debug.Log("no weapon");
+                Debug.Log("error weapon");
+                Debug.Log(weapon);
             }
         }
-        if (Input.GetButtonDown("Reload")) //recharge s'il a une arme
+        else
         {
-            if (isWeaponEquiped)
-            {
-                Debug.Log("reload");
-                weapon.GetComponent<equipweapons>().ammo = 10;
-            }
-            else
-            {
-                Debug.Log("no weapon");
-            }
+            Debug.Log("no weapon");
         }
+    }
+    private void GetHit()
+    {
 
-        if (Input.GetButtonDown("TakeWeapon")) //ramasse une arme
+    }
+    private void Run()
+    {
+        speed *= 2;
+    }
+    private void Reload()
+    {
+        if (isWeaponEquiped)
         {
-            if (!isWeaponEquiped && isWeaponArround)
+            Debug.Log("reload");
+            //reload
+            weapon.GetComponent<equipweapons>().ammo = 10;
+        }
+        else
+        {
+            Debug.Log("no weapon");
+        }
+    }
+    private void TakeWeapon()
+    {
+        if (!isWeaponEquiped) //s'il y a une arme au sol et le player n'en a pas
+        {
+            Debug.Log("take weapon");
+            //take weapon
+            if (isWeaponArround)
             {
                 Debug.Log("weapon taken");
                 weapon.transform.SetParent(transform);
@@ -162,61 +298,28 @@ public class playerlogic : MonoBehaviour
                 weapon.transform.rotation = weaponRota;
                 isWeaponArround = false;
             }
-            else if (isWeaponEquiped)
-            {
-                Debug.Log("weapon already equipped");
-            }
             else
             {
                 Debug.Log("no weapon here");
             }
         }
-        if (Input.GetButtonDown("DropWeapon")) //lâche son arme
+        else
         {
-            if (isWeaponEquiped)
-            {
-                Debug.Log("drop");
-                isWeaponEquiped = false;
-                weapon.SetActive(false);
-                weapon = null;
-            }
-            else
-            {
-                Debug.Log("no weapon");
-            }
-        }
-
-        // Mouvements
-        float translationV = Input.GetAxis("Vertical") * Time.deltaTime * speed;
-        float translationH = Input.GetAxis("Horizontal") * Time.deltaTime * speed;
-        transform.Translate(translationH, 0, translationV);
-
-        // Camera
-        float rotationV = Input.GetAxis("Mouse Y") * Time.deltaTime * speed;
-        float rotationH = Input.GetAxis("Mouse X") * Time.deltaTime * speed;
-        transform.RotateAround(transform.position, Vector3.up, rotationH * speedCameraX);
-        transform.RotateAround(transform.position, transform.right, -rotationV * speedCameraY);
-    }
-
-    public void LoseHealth()
-    {
-        health--;
-        if (health <= 0)
-        {
-            if (uiClass != null)
-            {
-                uiClass.OverUI();
-            }
-            else
-            {
-                Debug.LogError("uiClass is not initialized");
-            }
-            Destroy(gameObject);
+            Debug.Log("weapon already equipped");
         }
     }
-
-    public void FullHealth()
+    private void DropWeapon()
     {
-        health = 100;
+        if (isWeaponEquiped)
+        {
+            Debug.Log("drop");
+            isWeaponEquiped = false;
+            weapon.SetActive(false);
+            weapon = null;
+        }
+        else
+        {
+            Debug.Log("no weapon");
+        }
     }
 }
