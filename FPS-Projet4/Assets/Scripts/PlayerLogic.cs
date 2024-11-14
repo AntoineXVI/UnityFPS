@@ -168,8 +168,17 @@ public class playerlogic : MonoBehaviour
                 {
                     Debug.Log("weapon taken");
                     weapon.transform.SetParent(transform);
-                    weaponPos = GameObject.Find("weaponPosition").transform.position;
-                    weaponRota = GameObject.Find("weaponPosition").transform.rotation;
+                    if (weapon.name == "M4_8")
+                    {
+                        weaponPos = GameObject.Find("weaponPositionM4").transform.position;
+                        weaponRota = GameObject.Find("weaponPositionM4").transform.rotation;
+                    }
+                    if (weapon.name == "M1911")
+                    {
+                        weaponPos = GameObject.Find("weaponPositionM1911").transform.position;
+                        weaponRota = GameObject.Find("weaponPositionM1911").transform.rotation;
+                    }
+
                     weapon.transform.position = weaponPos;
                     weapon.transform.rotation = weaponRota;
                     isWeaponArround = false;
