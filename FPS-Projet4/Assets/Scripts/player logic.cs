@@ -3,6 +3,8 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Burst.CompilerServices;
 using UnityEngine;
+using UnityEngine.Playables;
+using static equipweapons;
 
 public class playerlogic : MonoBehaviour
 {
@@ -19,6 +21,8 @@ public class playerlogic : MonoBehaviour
     private Vector3 weaponPos;
     private Vector3 bulletPos;
     private Quaternion weaponRota;
+    private Animator weaponAnimator;
+    private equipweapons weaponInfo;
 
     // Start is called before the first frame update
     void Start()
@@ -92,10 +96,11 @@ public class playerlogic : MonoBehaviour
             if (isWeaponEquiped)
             {
                 Debug.Log("shoot");
+                weaponInfo = weapon.GetComponent<equipweapons>();
                 //balle
                 if (weapon)
                 {
-                    if (weapon.GetComponent<equipweapons>().ammo >= 1) //si on a plus d'une balle
+                    if ((weaponInfo.ammo >= 1) && (weaponInfo.WeaponCurrentState == WeaponState.Idle)) //si on a plus d'une balle
                     {
                         bulletPos = weapon.transform.Find("BulletPosition").transform.position;
                         GameObject bullet1 = Instantiate(bullet, bulletPos, weapon.transform.rotation);
@@ -141,7 +146,11 @@ public class playerlogic : MonoBehaviour
             {
                 Debug.Log("reload");
                 //reload
-                weapon.GetComponent<equipweapons>().ammo = 10;
+                weapon.GetComponent<equipweapons>().WeaponCurrentState = WeaponState.Reload;
+                weaponAnimator = weapon.GetComponent<Animator>();
+                weaponAnimator.SetBool("isReload", true);
+                Debug.Log("switch state");
+                StartCoroutine(ReloadWeapon());                
             }
             else
             {
@@ -204,4 +213,20 @@ public class playerlogic : MonoBehaviour
         transform.RotateAround(transform.position, Vector3.up, rotationH * speedCameraX);
         transform.RotateAround(transform.position, transform.right, -rotationV * speedCameraY);
     }
+
+    private IEnumerator ReloadWeapon()
+    {
+        Debug.Log("Reloading...");
+
+        // Obtenir la durée d'animation
+        float reloadTime = weapon.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).length;
+
+        // Attendre la fin de l'animation
+        yield return new WaitForSeconds(reloadTime);
+        weapon.GetComponent<Animator>().SetBool("isReload", false);
+        weapon.GetComponent<equipweapons>().ammo = 10;
+        weapon.GetComponent<equipweapons>().WeaponCurrentState = WeaponState.Idle;
+        Debug.Log("Reloading end");
+    }
+
 }
