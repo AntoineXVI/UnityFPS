@@ -21,6 +21,7 @@ public class playerlogic : MonoBehaviour
     private Vector3 bulletPos;
     private Quaternion weaponRota;
     private PlayerState currentState;
+    private Animator playerAnimator;
 
     private enum PlayerState
     {
@@ -47,6 +48,7 @@ public class playerlogic : MonoBehaviour
         bulletCasing = GameObject.Find("BulletLite_01_2");
         weapon = null;
         currentState = PlayerState.Idle;
+        playerAnimator = GetComponent<Animator>();
 
         isWeaponEquiped = false;
         isWeaponArround = false;
@@ -71,47 +73,59 @@ public class playerlogic : MonoBehaviour
         switch (currentState)
         {
             case PlayerState.Idle:
-                speed = initSpeed;
+                Reset();
                 Debug.Log(currentState);
                 break;
 
             case PlayerState.Run:
+                Reset();
                 Debug.Log(currentState);
+                playerAnimator.SetBool("isRuning", true);
                 Run();
                 break;
 
             case PlayerState.Jump:
+                Reset();
                 Debug.Log(currentState);
+                playerAnimator.SetBool("isJumping", true);
                 Jump();
                 break;
 
             case PlayerState.Shoot:
+                Reset();
                 Debug.Log(currentState);
+                playerAnimator.SetBool("isShooting", true);
                 Shoot();
                 break;
 
             case PlayerState.GetHit:
+                Reset();
                 Debug.Log(currentState);
+                playerAnimator.SetBool("isHit", true);
                 GetHit();
                 break;
             
             case PlayerState.Reload:
+                Reset();
                 Debug.Log(currentState);
+                playerAnimator.SetBool("isReloading", true);
                 Reload();
                 break;
 
             case PlayerState.TakeWeapon:
+                Reset();
                 Debug.Log(currentState);
+                playerAnimator.SetBool("Take", true);
                 TakeWeapon();
                 break;
 
             case PlayerState.DropWeapon:
+                Reset();
                 Debug.Log(currentState);
+                playerAnimator.SetBool("Drop", true);
                 DropWeapon();
                 break;
-
         }
-
 
         if (Input.GetButtonDown("SetCursor")) //hide or show the cursor
         {
@@ -182,6 +196,18 @@ public class playerlogic : MonoBehaviour
 
         transform.RotateAround(transform.position, Vector3.up, rotationH * speedCameraX);
         transform.RotateAround(transform.position, transform.right, -rotationV * speedCameraY);
+    }
+    private void Reset()
+    {
+        playerAnimator.SetBool("isRunning",false);
+        playerAnimator.SetBool("isShooting",false);
+        playerAnimator.SetBool("isReloading",false);
+        playerAnimator.SetBool("isJumping", false);
+        playerAnimator.SetBool("isHit",false);
+        playerAnimator.SetBool("Drop",false);
+        playerAnimator.SetBool("Take",false);
+
+        speed = initSpeed;
     }
 
     private void Jump()
