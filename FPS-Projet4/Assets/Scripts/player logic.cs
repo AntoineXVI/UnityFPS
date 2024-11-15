@@ -3,11 +3,12 @@ using System.Collections;
 using System.Collections.Generic;
 using Unity.Burst.CompilerServices;
 using UnityEngine;
-using static equipweapons;
+using UnityEngine.Android;
+using UnityEngine.Playables;
+
 public class playerlogic : MonoBehaviour
 {
     public int speed;
-    public int initSpeed;
     public int speedCameraY;
     public int speedCameraX;
     public GameObject weapon;
@@ -19,24 +20,48 @@ public class playerlogic : MonoBehaviour
 
     private Vector3 weaponPos;
     private Vector3 bulletPos;
-    private Quaternion weaponRota;   
+    private Quaternion weaponRota;
+
+    private AudioManagingScript audioClass;
+    private gameOverLogic uiClass;
+
+    public int health = 100;
 
     // Start is called before the first frame update
     void Start()
     {
         speed = 5;
-        initSpeed = 5;
         speedCameraY = 40;
         speedCameraX = 50;
         Cursor.visible = false;
         Cursor.lockState = CursorLockMode.Locked;
         bullet = GameObject.Find("BulletLite_01_1");
         bulletCasing = GameObject.Find("BulletLite_01_2");
-        weapon = null;
-       
+
         isWeaponEquiped = false;
         isWeaponArround = false;
+
+        // Initialisation de uiClass
+        GameObject audioObject = GameObject.FindWithTag("Audio");
+        if (audioObject != null)
+        {
+            audioClass = audioObject.GetComponent<AudioManagingScript>();
+        }
+        else
+        {
+            Debug.LogError("UI object with tag 'UI' not found");
+        }
+        GameObject uiObject = GameObject.FindWithTag("UICaller");
+        if (uiObject != null)
+        {
+            uiClass = uiObject.GetComponent<gameOverLogic>();
+        }
+        else
+        {
+            Debug.LogError("UI object with tag 'UI' not found");
+        }
     }
+
     bool grounded()
     {
         if (GetComponent<Rigidbody>().velocity.y == 0)
@@ -52,7 +77,6 @@ public class playerlogic : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-
         if (Input.GetButtonDown("SetCursor")) //hide or show the cursor
         {
             Debug.Log("cursor");
@@ -70,16 +94,15 @@ public class playerlogic : MonoBehaviour
 
         if (Input.GetButtonDown("Jump") && grounded()) //saut s'il est au sol
         {
-            
             GetComponent<Rigidbody>().AddForce(new Vector3(0, 5, 0), ForceMode.Impulse);
         }
-        if (Input.GetButtonDown("Sprint")) 
+        if (Input.GetButtonDown("Sprint"))
         {
             speed *= 2;
         }
         if (Input.GetButtonUp("Sprint"))
         {
-            speed = initSpeed;
+            speed /= 2;
         }
         if (Input.GetButtonDown("Crouch"))
         {
@@ -99,8 +122,10 @@ public class playerlogic : MonoBehaviour
                 //balle
                 if (weapon)
                 {
+
                     if (weapon.GetComponent<equipweapons>().ammo >= 1) //si on a plus d'une balle
                     {
+                        audioClass.fireSound();
                         bulletPos = weapon.transform.Find("BulletPosition").transform.position;
                         GameObject bullet1 = Instantiate(bullet, bulletPos, weapon.transform.rotation);
                         bullet1.transform.RotateAround(bullet1.transform.position, Vector3.up, -90);
@@ -121,6 +146,7 @@ public class playerlogic : MonoBehaviour
                         bulletCasing1.AddComponent<BoxCollider>();
                         bulletCasing1.AddComponent<ammologic>();
                         bulletCasing1.transform.localScale *= 3;
+                        Destroy(bulletCasing1, 0.5f);
                     }
                     else
                     {
@@ -144,19 +170,17 @@ public class playerlogic : MonoBehaviour
             if (isWeaponEquiped)
             {
                 Debug.Log("reload");
-
-                //reload
-                StartCoroutine(ReloadCoroutine());
+                audioClass.reloadSound();
+                StartCoroutine(ReloadWeapon());
                 weapon.GetComponent<equipweapons>().ammo = 10;
-                Debug.Log("end reload");
             }
             else
             {
                 Debug.Log("no weapon");
             }
         }
-       
-        if (Input.GetButtonDown("TakeWeapon")) //ramasse une arme
+
+        if (Input.GetButtonDown("TakeWeapon")) //rmasse une arme
         {
             if (!isWeaponEquiped) //s'il y a une arme au sol et le player n'en a pas
             {
@@ -165,6 +189,7 @@ public class playerlogic : MonoBehaviour
                 if (isWeaponArround)
                 {
                     Debug.Log("weapon taken");
+                    Destroy(weapon.GetComponent<Rigidbody>());
                     weapon.transform.SetParent(transform);
                     weaponPos = GameObject.Find("weaponPosition").transform.position;
                     weaponRota = GameObject.Find("weaponPosition").transform.rotation;
@@ -173,7 +198,7 @@ public class playerlogic : MonoBehaviour
 
                     if (weapon.name == "M1911")
                     {
-                        weapon.transform.Rotate(new Vector3(180, 0, 0)); //ca tourne pas le pistolet je sais pas pourquoi
+                        weapon.transform.RotateAround(weapon.transform.position, Vector3.up, 180);
                         Debug.Log("turn");
                     }
                     
@@ -202,31 +227,57 @@ public class playerlogic : MonoBehaviour
             {
                 Debug.Log("no weapon");
             }
+
         }
         //mouvements
         float translationV = Input.GetAxis("Vertical") * Time.deltaTime * speed;
 
         float translationH = Input.GetAxis("Horizontal") * Time.deltaTime * speed;
 
-        transform.Translate(translationH, 0, translationV) ;
+        transform.Translate(translationH, 0, translationV);
         //camera 
         float rotationV = Input.GetAxis("Mouse Y") * Time.deltaTime * speed;
-       
+
         float rotationH = Input.GetAxis("Mouse X") * Time.deltaTime * speed;
 
         transform.RotateAround(transform.position, Vector3.up, rotationH * speedCameraX);
         transform.RotateAround(transform.position, transform.right, -rotationV * speedCameraY);
     }
-
-    private IEnumerator ReloadCoroutine()
+    private IEnumerator ReloadWeapon()
     {
-        weapon.GetComponent<equipweapons>().currentWeaponState = WeaponState.Reload;
+        Debug.Log("Reloading...");
+        weapon.GetComponent<equipweapons>().currentWeaponState = equipweapons.WeaponState.Reload;
 
-        // Attend la fin de l'animation de rechargement
+        // Obtenir la durée du clip d'animation actuel
         float reloadTime = weapon.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).length;
+
+        // Attendre la fin de l'animation
         yield return new WaitForSeconds(reloadTime);
 
-        weapon.GetComponent<equipweapons>().currentWeaponState = WeaponState.Idle;
-        Debug.Log("Reload complete");
+        // Remplir les munitions et remettre l'état à Idle
+        weapon.GetComponent<equipweapons>().currentWeaponState = equipweapons.WeaponState.Idle;
     }
+
+    public void LoseHealth()
+    {
+        health--;
+        if (health <= 0)
+        {
+            if (uiClass != null)
+            {
+                uiClass.OverUI();
+            }
+            else
+            {
+                Debug.LogError("uiClass is not initialized");
+            }
+            Destroy(gameObject);
+        }
+    }
+
+    public void FullHealth()
+    {
+        health = 100;
+    }
+
 }

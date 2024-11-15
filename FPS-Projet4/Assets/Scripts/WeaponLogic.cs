@@ -40,16 +40,12 @@ public class equipweapons : MonoBehaviour
         if (player != null)
         {
             if (gameObject.transform.parent == player.transform) //si l'arme est un enfant = equip�
-        {
-            if (gameObject.transform.parent == player.transform) //si l'arme est un enfant = equip�
             {
                 player.GetComponent<playerlogic>().isWeaponEquiped = true;
                 player.GetComponent<playerlogic>().weapon = gameObject;
                 gameObject.SetActive(true);
             }
         }
-        }
-                
     }
     private void OnCollisionEnter(Collision collision)
     {
