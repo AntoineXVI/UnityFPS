@@ -4,6 +4,7 @@ using System.Collections.Generic;
 using Unity.Burst.CompilerServices;
 using UnityEngine;
 using UnityEngine.Android;
+using UnityEngine.Playables;
 
 public class playerlogic : MonoBehaviour
 {
@@ -121,7 +122,7 @@ public class playerlogic : MonoBehaviour
                 //balle
                 if (weapon)
                 {
-                    
+
                     if (weapon.GetComponent<equipweapons>().ammo >= 1) //si on a plus d'une balle
                     {
                         audioClass.fireSound();
@@ -170,6 +171,7 @@ public class playerlogic : MonoBehaviour
             {
                 Debug.Log("reload");
                 audioClass.reloadSound();
+                StartCoroutine(ReloadWeapon());
                 weapon.GetComponent<equipweapons>().ammo = 10;
             }
             else
@@ -193,6 +195,13 @@ public class playerlogic : MonoBehaviour
                     weaponRota = GameObject.Find("weaponPosition").transform.rotation;
                     weapon.transform.position = weaponPos;
                     weapon.transform.rotation = weaponRota;
+
+                    if (weapon.name == "M1911")
+                    {
+                        weapon.transform.RotateAround(weapon.transform.position, Vector3.up, 180);
+                        Debug.Log("turn");
+                    }
+                    
                     isWeaponArround = false;
                 }
                 else
@@ -233,6 +242,20 @@ public class playerlogic : MonoBehaviour
 
         transform.RotateAround(transform.position, Vector3.up, rotationH * speedCameraX);
         transform.RotateAround(transform.position, transform.right, -rotationV * speedCameraY);
+    }
+    private IEnumerator ReloadWeapon()
+    {
+        Debug.Log("Reloading...");
+        weapon.GetComponent<equipweapons>().currentWeaponState = equipweapons.WeaponState.Reload;
+
+        // Obtenir la durée du clip d'animation actuel
+        float reloadTime = weapon.GetComponent<Animator>().GetCurrentAnimatorStateInfo(0).length;
+
+        // Attendre la fin de l'animation
+        yield return new WaitForSeconds(reloadTime);
+
+        // Remplir les munitions et remettre l'état à Idle
+        weapon.GetComponent<equipweapons>().currentWeaponState = equipweapons.WeaponState.Idle;
     }
 
     public void LoseHealth()

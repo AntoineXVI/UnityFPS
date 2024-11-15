@@ -7,25 +7,45 @@ public class equipweapons : MonoBehaviour
 {
     public GameObject player;
     public int ammo;
+    public WeaponState currentWeaponState;
+    private Animator weaponAnimator;
+
+    public enum WeaponState
+    {
+        Idle,
+        Reload,
+    }
+
     // Start is called before the first frame update
     void Start()
     {
         player = GameObject.FindWithTag("Player");
         ammo = 10;
+        currentWeaponState = WeaponState.Idle;
+        weaponAnimator = GetComponent<Animator>();
     }
 
     private void Update()
     {
+        switch (currentWeaponState)
+        {
+            case WeaponState.Idle:
+                weaponAnimator.SetBool("isReloading", false);
+                break;
+            case WeaponState.Reload:
+                weaponAnimator.SetBool("isReloading", true);
+                break;
+        }
+        
         if (player != null)
         {
-            if (gameObject.transform.parent == player.transform) //si l'arme est un enfant = equipé
+            if (gameObject.transform.parent == player.transform) //si l'arme est un enfant = equipï¿½
             {
                 player.GetComponent<playerlogic>().isWeaponEquiped = true;
                 player.GetComponent<playerlogic>().weapon = gameObject;
                 gameObject.SetActive(true);
             }
         }
-        
     }
     private void OnCollisionEnter(Collision collision)
     {
