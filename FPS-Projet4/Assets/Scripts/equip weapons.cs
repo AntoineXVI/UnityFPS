@@ -7,20 +7,10 @@ public class equipweapons : MonoBehaviour
 {
     public GameObject player;
     public int ammo;
-    public WeaponState WeaponCurrentState;
-
-    public enum WeaponState
-    {
-        Idle,
-        Reload,
-    }
-
-
     // Start is called before the first frame update
     void Start()
     {
         player = GameObject.FindWithTag("Player");
-        WeaponCurrentState = WeaponState.Idle;
         ammo = 10;
     }
 
