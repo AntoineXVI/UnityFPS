@@ -21,7 +21,6 @@ public class playerlogic : MonoBehaviour
     private Vector3 bulletPos;
     private Quaternion weaponRota;
 
-    // Insérer ici l'appel de classe startLogic
     private AudioManagingScript audioClass;
     private gameOverLogic uiClass;
 

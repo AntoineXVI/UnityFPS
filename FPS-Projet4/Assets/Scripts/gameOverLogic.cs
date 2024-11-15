@@ -10,12 +10,4 @@ public class gameOverLogic : MonoBehaviour
     {
         SceneManager.LoadScene("GameOver");
     }
-
-    public void Update()
-    {
-        if (Input.GetKeyDown(KeyCode.Escape))
-        {
-            Application.Quit();
-        }
-    }
 }

@@ -18,6 +18,8 @@ public class EnnemyBehaviour : MonoBehaviour
     private Vector3 weaponPos;
     private Vector3 bulletPos;
 
+    private AudioManagingScript audioClass;
+
     private void followPlayer()
     {
         if (following != null)
@@ -57,6 +59,7 @@ public class EnnemyBehaviour : MonoBehaviour
     {
         if (bulletPos != null)
         {
+            audioClass.fireSound();
             bulletPos = weapon.transform.Find("BulletPosition").transform.position;
             GameObject bullet1 = Instantiate(bullet, bulletPos, weapon.transform.rotation);
             bullet1.transform.RotateAround(bullet1.transform.position, Vector3.up, -90);
@@ -91,6 +94,16 @@ public class EnnemyBehaviour : MonoBehaviour
         bullet = GameObject.Find("BulletLite_01");
         following = GameObject.FindWithTag("Player");
         lastShootTime = Time.time;
+
+        GameObject audioObject = GameObject.FindWithTag("Audio");
+        if (audioObject != null)
+        {
+            audioClass = audioObject.GetComponent<AudioManagingScript>();
+        }
+        else
+        {
+            Debug.LogError("UI object with tag 'UI' not found");
+        }
     }
 
     // Update is called once per frame
