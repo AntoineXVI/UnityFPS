@@ -170,6 +170,13 @@ public class playerlogic : MonoBehaviour
                     weaponRota = GameObject.Find("weaponPosition").transform.rotation;
                     weapon.transform.position = weaponPos;
                     weapon.transform.rotation = weaponRota;
+
+                    if (weapon.name == "M1911")
+                    {
+                        weapon.transform.Rotate(new Vector3(180, 0, 0)); //ca tourne pas le pistolet je sais pas pourquoi
+                        Debug.Log("turn");
+                    }
+                    
                     isWeaponArround = false;
                 }
                 else
