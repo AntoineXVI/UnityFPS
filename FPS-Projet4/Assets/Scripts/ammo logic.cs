@@ -37,7 +37,6 @@ public class ammologic : MonoBehaviour
         }
         if (collision.gameObject.tag == "Ennemy")
         {
-            
             Debug.Log("Mob Lost HP");
             collision.gameObject.GetComponent<MobLogic>().LoseHealth();
             Destroy(gameObject);
