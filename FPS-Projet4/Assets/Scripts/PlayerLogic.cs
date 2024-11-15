@@ -145,6 +145,7 @@ public class playerlogic : MonoBehaviour
                         bulletCasing1.AddComponent<BoxCollider>();
                         bulletCasing1.AddComponent<ammologic>();
                         bulletCasing1.transform.localScale *= 3;
+                        Destroy(bulletCasing1, 0.5f);
                     }
                     else
                     {
