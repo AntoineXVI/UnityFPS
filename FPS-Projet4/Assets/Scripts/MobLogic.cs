@@ -5,7 +5,7 @@ using UnityEngine;
 public class MobLogic : MonoBehaviour
 {
     //GameObject mob;
-    public int health = 3;
+    public int health = 6;
     GameObject weapon;
 
     private AudioManagingScript audioClass;

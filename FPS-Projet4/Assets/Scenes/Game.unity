@@ -32427,7 +32427,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   EnvironmentIntensity1: 3
   EnvironmentIntensityStart: 10
-  dayTime: 6
+  dayTime: 15
   environmentLight: {fileID: 2100000, guid: 867877b70616f3f4d98133b3f9322692, type: 2}
 --- !u!1 &416074512
 GameObject:
@@ -117447,7 +117447,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ca8f2f82a32e5043b03776704b66fa9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 3
+  health: 6
 --- !u!136 &2075023148
 CapsuleCollider:
   m_ObjectHideFlags: 0
@@ -118974,7 +118974,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 4ca8f2f82a32e5043b03776704b66fa9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  health: 3
+  health: 6
 --- !u!136 &2130751652
 CapsuleCollider:
   m_ObjectHideFlags: 0
