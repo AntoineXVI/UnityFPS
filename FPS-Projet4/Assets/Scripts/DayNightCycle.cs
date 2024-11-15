@@ -37,7 +37,7 @@ public class DayNightCycle : MonoBehaviour
     {
         if (RenderSettings.ambientIntensity > EnvironmentIntensity1 && start == true)
         {
-            RenderSettings.ambientIntensity -= 0.1f;
+            RenderSettings.ambientIntensity -= 0.025f;
             if (RenderSettings.ambientIntensity <= EnvironmentIntensity1)
             {
                 start = false;

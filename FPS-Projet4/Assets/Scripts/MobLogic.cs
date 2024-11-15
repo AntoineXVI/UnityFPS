@@ -34,9 +34,9 @@ public class MobLogic : MonoBehaviour
     public void LoseHealth()
     {
         health--;
-        if (health >= 0)
+        audioClass.ennemyDeathSound();
+        if (health <= 0)
         {
-            audioClass.ennemyDeathSound();
             Instantiate(weapon, transform.position, transform.rotation);
             Destroy(gameObject);
         }
