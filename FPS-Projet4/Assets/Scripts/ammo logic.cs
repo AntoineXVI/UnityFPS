@@ -14,7 +14,10 @@ public class ammologic : MonoBehaviour
     {
         speed = 4f;
         weapon = GameObject.FindWithTag("Player").GetComponent<playerlogic>().weapon;
-        SpawnPosition = weapon.transform.GetChild(4).position;
+        if (weapon != null )
+        {
+            SpawnPosition = weapon.transform.GetChild(4).position;
+        }
         gameObject.SetActive(true);
     }
 
